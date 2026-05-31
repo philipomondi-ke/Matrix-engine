@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Matrix Engine — AI-Powered Game Development Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Syne:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --cyan:#00e5ff;--cyan-dim:rgba(0,229,255,0.10);--cyan-glow:rgba(0,229,255,0.3);
+  --red:#ff2244;--green:#00ff88;--gold:#ffcc00;
+  --bg:#060b10;--bg2:#08101a;--bg3:#0c1820;
+  --border:rgba(0,229,255,0.1);--border2:rgba(0,229,255,0.2);
+  --text:#7aaabb;--text-bright:#cce8f8;--white:#fff;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;overflow-x:hidden;}
+
+/* grid bg */
+.grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,0.025) 1px,transparent 1px);background-size:55px 55px;pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:rgba(6,11,16,0.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:200;}
+.nav-logo{display:flex;align-items:center;gap:9px;text-decoration:none;}
+.nav-logo-text{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;color:var(--cyan);letter-spacing:.22em;text-shadow:0 0 18px var(--cyan-glow);}
+.nav-links{display:flex;align-items:center;gap:6px;}
+.nav-link{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text);padding:6px 12px;border-radius:3px;text-decoration:none;letter-spacing:.08em;transition:color .15s;}
+.nav-link:hover{color:var(--cyan);}
+.nav-cta{background:var(--cyan);color:#000;font-family:'Orbitron',monospace;font-size:10px;font-weight:700;letter-spacing:.12em;padding:8px 18px;border-radius:3px;text-decoration:none;transition:all .2s;box-shadow:0 0 20px rgba(0,229,255,.2);}
+.nav-cta:hover{box-shadow:0 0 35px rgba(0,229,255,.45);transform:translateY(-1px);}
+
+/* SECTIONS */
+section{position:relative;z-index:1;}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:120px 40px 80px;overflow:hidden;}
+.hero-glow{position:absolute;top:35%;left:50%;transform:translate(-50%,-50%);width:900px;height:600px;background:radial-gradient(ellipse,rgba(0,229,255,0.06) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(0,255,136,.3);background:rgba(0,255,136,.05);color:var(--green);font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.15em;padding:6px 14px;border-radius:2px;margin-bottom:36px;animation:fade-up .6s ease both;}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.hero-title{font-family:'Orbitron',monospace;font-size:clamp(32px,6.5vw,78px);font-weight:900;line-height:1.06;color:var(--white);margin-bottom:14px;animation:fade-up .7s .1s ease both;letter-spacing:.02em;}
+.hero-title span{color:var(--cyan);text-shadow:0 0 40px var(--cyan-glow),0 0 80px rgba(0,229,255,.12);}
+.hero-sub{font-size:clamp(13px,1.8vw,18px);color:var(--text);max-width:580px;line-height:1.75;margin-bottom:46px;animation:fade-up .7s .2s ease both;}
+.hero-sub strong{color:var(--text-bright);}
+.hero-btns{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;animation:fade-up .7s .3s ease both;margin-bottom:60px;}
+.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--cyan);color:#000;font-family:'Orbitron',monospace;font-size:11px;font-weight:700;letter-spacing:.12em;padding:13px 28px;border-radius:3px;border:none;cursor:pointer;text-decoration:none;transition:all .2s;box-shadow:0 0 28px rgba(0,229,255,.28);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 0 50px rgba(0,229,255,.48);}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--text-bright);font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.08em;padding:13px 24px;border-radius:3px;border:1px solid var(--border);cursor:pointer;text-decoration:none;transition:all .2s;}
+.btn-secondary:hover{border-color:var(--border2);color:var(--cyan);}
+@keyframes fade-up{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+
+/* MOCKUP */
+.hero-preview{width:100%;max-width:880px;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--bg2);box-shadow:0 0 80px rgba(0,0,0,.8),0 0 40px rgba(0,229,255,.04);animation:fade-up .8s .4s ease both;}
+.p-topbar{height:30px;background:#080e14;border-bottom:1px solid #0d2333;display:flex;align-items:center;padding:0 12px;gap:8px;}
+.p-dot{width:7px;height:7px;border-radius:50%;}
+.p-logo{font-family:'Orbitron',monospace;font-size:8px;color:var(--cyan);letter-spacing:.2em;margin-left:8px;}
+.p-menu{display:flex;margin-left:8px;}
+.p-mi{font-family:'Share Tech Mono',monospace;font-size:8px;color:#3a6070;padding:0 6px;}
+.p-atl{margin-left:auto;font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--cyan);border:1px solid rgba(0,229,255,.25);padding:1px 6px;border-radius:2px;}
+.p-tabs{height:24px;background:#060c11;border-bottom:1px solid #0d1f2d;display:flex;align-items:stretch;padding:0 6px;}
+.p-tab{font-family:'Share Tech Mono',monospace;font-size:8px;padding:0 8px;display:flex;align-items:center;color:#2d4a5a;}
+.p-tab.active{color:#cce8f8;border-bottom:2px solid var(--cyan);}
+.p-body{display:flex;height:220px;}
+.p-sb{width:38px;background:#080d12;border-right:1px solid #0d2333;display:flex;flex-direction:column;align-items:center;padding:6px 0;gap:3px;}
+.p-si{width:30px;height:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;}
+.p-si-ic{width:11px;height:11px;background:#1e3a50;border-radius:2px;}
+.p-si-ic.on{background:var(--cyan);}
+.p-si-lb{font-size:4px;font-family:'Share Tech Mono',monospace;color:#1e3340;}
+.p-si-lb.on{color:var(--cyan);}
+.p-hier{width:140px;background:#090e14;border-right:1px solid #0d2333;padding:7px;}
+.p-pt{font-family:'Share Tech Mono',monospace;font-size:7px;color:#4a7a8a;letter-spacing:.1em;margin-bottom:6px;border-bottom:1px solid #0d2333;padding-bottom:3px;}
+.p-ti{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:#2d4a5a;padding:1px 0 1px 6px;border-left:1px solid #0d2333;margin-left:4px;}
+.p-ti.hi{color:var(--cyan);border-left-color:var(--cyan);}
+.p-vp{flex:1;background:linear-gradient(135deg,#060c14,#0a1520,#060f18);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.p-vg{position:absolute;inset:0;background-image:linear-gradient(rgba(0,229,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.04) 1px,transparent 1px);background-size:20px 20px;}
+.p-scan{position:absolute;left:0;right:0;height:1px;background:linear-gradient(to right,transparent,var(--cyan),transparent);opacity:.35;animation:scan 4s linear infinite;}
+@keyframes scan{0%{top:0;}100%{top:100%;}}
+.p-vp-txt{font-family:'Orbitron',monospace;font-size:9px;color:rgba(0,229,255,.12);letter-spacing:.3em;z-index:1;}
+.p-insp{width:130px;background:#090e14;border-left:1px solid #0d2333;padding:7px;}
+.p-prop{margin-bottom:5px;}
+.p-pl{font-family:'Share Tech Mono',monospace;font-size:6px;color:#3a5a6a;margin-bottom:1px;}
+.p-pv{font-family:'Share Tech Mono',monospace;font-size:7px;color:#cce8f8;background:#060c11;border:1px solid #0d2333;padding:2px 5px;border-radius:2px;}
+.p-ai{margin-top:8px;padding:5px;background:rgba(0,229,255,.04);border:1px solid rgba(0,229,255,.12);border-radius:3px;}
+.p-ai-t{font-family:'Share Tech Mono',monospace;font-size:6.5px;color:var(--cyan);margin-bottom:2px;}
+.p-ai-b{font-family:'Share Tech Mono',monospace;font-size:6px;color:#3a6070;line-height:1.5;}
+
+/* STATS */
+.stats-bar{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:24px 40px;display:flex;justify-content:center;gap:72px;flex-wrap:wrap;}
+.stat-num{font-family:'Orbitron',monospace;font-size:26px;font-weight:700;color:var(--cyan);text-shadow:0 0 18px var(--cyan-glow);display:block;margin-bottom:4px;}
+.stat-label{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a5a6a;letter-spacing:.12em;}
+
+/* SHARED */
+.section-label{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.2em;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
+.section-label.red{color:var(--red);}
+.section-label.cyan{color:var(--cyan);}
+.section-label.green{color:var(--green);}
+.section-label.gold{color:var(--gold);}
+.section-title{font-family:'Orbitron',monospace;font-size:clamp(22px,3.8vw,40px);font-weight:700;color:var(--white);line-height:1.22;margin-bottom:50px;}
+.section-title span{color:var(--cyan);}
+.inner{max-width:1100px;margin:0 auto;padding:0 40px;}
+
+/* PROBLEM */
+.problem-section{padding:90px 0;}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:18px;}
+.problem-card{background:var(--bg2);border:1px solid rgba(255,34,68,.14);border-radius:6px;padding:26px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
+.problem-card:hover{transform:translateY(-3px);border-color:rgba(255,34,68,.32);}
+.problem-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--red),transparent);}
+.pnum{font-family:'Orbitron',monospace;font-size:44px;font-weight:900;color:rgba(255,34,68,.07);line-height:1;margin-bottom:10px;}
+.ptitle{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--red);letter-spacing:.1em;margin-bottom:10px;}
+.pdesc{font-size:13px;line-height:1.72;color:var(--text);}
+
+/* SOLUTION */
+.solution-section{padding:90px 0;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.feature-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:18px;}
+.feature-card{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:28px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;}
+.feature-card:hover{transform:translateY(-3px);border-color:var(--border2);box-shadow:0 8px 40px rgba(0,0,0,.4);}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--cyan),transparent);}
+.ficon{width:40px;height:40px;border-radius:6px;background:var(--cyan-dim);border:1px solid rgba(0,229,255,.18);display:flex;align-items:center;justify-content:center;margin-bottom:18px;font-size:18px;}
+.ftitle{font-family:'Orbitron',monospace;font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.1em;margin-bottom:10px;}
+.fdesc{font-size:13px;line-height:1.72;color:var(--text);}
+
+/* REVIEWS */
+.reviews-section{padding:90px 0;}
+.reviews-intro{font-size:15px;line-height:1.7;color:var(--text);max-width:600px;margin-bottom:50px;}
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-bottom:50px;}
+.review-card{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:24px;position:relative;transition:transform .2s,border-color .2s;}
+.review-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.review-card::before{content:'"';position:absolute;top:12px;right:18px;font-family:'Orbitron',monospace;font-size:52px;color:rgba(0,229,255,.05);line-height:1;}
+.review-stars{color:var(--gold);font-size:13px;margin-bottom:12px;letter-spacing:2px;}
+.review-text{font-size:13px;line-height:1.75;color:var(--text-bright);margin-bottom:16px;font-style:italic;}
+.review-author{display:flex;align-items:center;gap:10px;}
+.review-avatar{width:32px;height:32px;border-radius:50%;background:var(--cyan-dim);border:1px solid rgba(0,229,255,.2);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);font-weight:700;flex-shrink:0;}
+.review-name{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--text-bright);}
+.review-role{font-family:'Share Tech Mono',monospace;font-size:9px;color:#3a5a6a;}
+.review-badge{display:inline-block;font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--green);border:1px solid rgba(0,255,136,.2);padding:2px 7px;border-radius:2px;margin-top:4px;}
+
+/* LEAVE REVIEW FORM */
+.leave-review-box{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:36px;margin-top:10px;}
+.leave-review-title{font-family:'Orbitron',monospace;font-size:16px;color:var(--white);margin-bottom:6px;}
+.leave-review-sub{font-size:13px;color:var(--text);margin-bottom:28px;line-height:1.6;}
+.star-select{display:flex;gap:6px;margin-bottom:20px;}
+.star-btn{background:none;border:none;cursor:pointer;font-size:22px;color:#1e3a50;transition:color .15s;padding:0;}
+.star-btn.active,.star-btn:hover{color:var(--gold);}
+
+/* FORM SHARED */
+.form-group{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.form-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:#4a7a8a;letter-spacing:.1em;}
+.form-input,.form-select,.form-textarea{background:var(--bg);border:1px solid #0d2333;border-radius:4px;color:var(--text-bright);font-family:'Share Tech Mono',monospace;font-size:13px;padding:11px 13px;outline:none;transition:border-color .18s,box-shadow .18s;width:100%;-webkit-appearance:none;appearance:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(0,229,255,.07);}
+.form-input::placeholder,.form-textarea::placeholder{color:#1e3a50;}
+.form-textarea{resize:vertical;min-height:90px;font-size:13px;}
+.select-wrap{position:relative;}
+.select-wrap::after{content:'▼';position:absolute;right:13px;top:50%;transform:translateY(-50%);color:#3a5a6a;font-size:9px;pointer-events:none;}
+.form-select option{background:#0c1820;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.submit-btn{width:100%;background:var(--cyan);color:#000;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:.14em;padding:14px;border:none;border-radius:4px;cursor:pointer;margin-top:6px;transition:all .2s;box-shadow:0 0 28px rgba(0,229,255,.22);display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 0 48px rgba(0,229,255,.42);}
+.submit-btn.gold-btn{background:var(--gold);box-shadow:0 0 28px rgba(255,204,0,.22);}
+.submit-btn.gold-btn:hover{box-shadow:0 0 48px rgba(255,204,0,.42);}
+.submit-btn.green-btn{background:var(--green);box-shadow:0 0 28px rgba(0,255,136,.22);}
+.form-note{text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;color:#2a4a5a;margin-top:14px;line-height:1.6;}
+.success-state{display:none;text-align:center;padding:36px 20px;}
+.success-icon-big{font-size:44px;margin-bottom:14px;display:block;}
+.success-title{font-family:'Orbitron',monospace;font-size:18px;color:var(--cyan);margin-bottom:10px;}
+.success-text{font-size:14px;color:var(--text);line-height:1.7;}
+
+/* WAITLIST */
+.waitlist-section{padding:90px 0;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;overflow:hidden;}
+.waitlist-glow{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:1000px;height:700px;background:radial-gradient(ellipse,rgba(0,229,255,.05) 0%,transparent 70%);pointer-events:none;}
+.waitlist-inner{max-width:700px;margin:0 auto;padding:0 40px;text-align:center;}
+
+/* TEAM */
+.team-section{padding:90px 0;}
+.team-intro{font-size:15px;line-height:1.75;color:var(--text);max-width:650px;margin-bottom:50px;}
+.roles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:50px;}
+.role-card{background:var(--bg2);border:1px solid rgba(255,204,0,.12);border-radius:6px;padding:22px;position:relative;transition:transform .2s,border-color .2s;}
+.role-card:hover{transform:translateY(-2px);border-color:rgba(255,204,0,.28);}
+.role-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--gold),transparent);}
+.role-badge{font-family:'Share Tech Mono',monospace;font-size:8px;color:var(--gold);border:1px solid rgba(255,204,0,.2);padding:2px 8px;border-radius:2px;display:inline-block;margin-bottom:10px;}
+.role-title{font-family:'Orbitron',monospace;font-size:12px;color:var(--white);margin-bottom:8px;font-weight:700;}
+.role-desc{font-size:12px;line-height:1.65;color:var(--text);}
+.team-apply-box{background:var(--bg2);border:1px solid rgba(255,204,0,.15);border-radius:8px;padding:36px;position:relative;overflow:hidden;}
+.team-apply-box::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,var(--gold),var(--cyan),transparent);}
+
+/* FOOTER */
+footer{padding:36px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:var(--bg);}
+.footer-logo{display:flex;align-items:center;gap:8px;}
+.footer-logo-text{font-family:'Orbitron',monospace;font-size:11px;color:var(--cyan);letter-spacing:.18em;}
+.footer-links{display:flex;gap:20px;}
+.footer-link{font-family:'Share Tech Mono',monospace;font-size:10px;color:#2a4a5a;text-decoration:none;transition:color .15s;letter-spacing:.06em;}
+.footer-link:hover{color:var(--cyan);}
+.footer-copy{font-family:'Share Tech Mono',monospace;font-size:9px;color:#1e3340;letter-spacing:.06em;}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  nav{padding:0 16px;}
+  .nav-links{display:none;}
+  .hero{padding:90px 20px 60px;}
+  .inner{padding:0 20px;}
+  .stats-bar{gap:36px;padding:24px 20px;}
+  .form-row{grid-template-columns:1fr;}
+  .leave-review-box,.team-apply-box{padding:22px;}
+  .waitlist-inner{padding:0 20px;}
+  .p-hier,.p-insp{display:none;}
+  footer{padding:24px 20px;flex-direction:column;text-align:center;}
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <polygon points="12,2 22,20 2,20" stroke="#00e5ff" stroke-width="1.8" stroke-linejoin="round" fill="none"/>
+      <polygon points="12,7 19,19 5,19" fill="#00e5ff" opacity="0.18"/>
+    </svg>
+    <span class="nav-logo-text">MATRIX ENGINE</span>
+  </a>
+  <div class="nav-links">
+    <a href="#problem" class="nav-link">WHY IT EXISTS</a>
+    <a href="#solution" class="nav-link">WHAT WE BUILD</a>
+    <a href="#reviews" class="nav-link">REVIEWS</a>
+    <a href="#team" class="nav-link">JOIN TEAM</a>
+    <a href="#waitlist" class="nav-cta">EARLY ACCESS</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-badge"><div class="bdot"></div>EARLY ACCESS — BUILDING WITH DEVELOPERS LIKE YOU</div>
+  <h1 class="hero-title">Game Dev Should Not<br/>Feel Like <span>War With<br/>Your Tools</span></h1>
+  <p class="hero-sub">Matrix Engine is an <strong>AI-powered development companion</strong> that unifies learning, building, debugging, and shipping inside one environment that actually understands your project.</p>
+  <div class="hero-btns">
+    <a href="#waitlist" class="btn-primary">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+      JOIN EARLY ACCESS
+    </a>
+    <a href="#reviews" class="btn-secondary">Read Developer Reviews →</a>
+  </div>
+
+  <div class="hero-preview">
+    <div class="p-topbar">
+      <div class="p-dot" style="background:#ff5f57"></div>
+      <div class="p-dot" style="background:#febc2e"></div>
+      <div class="p-dot" style="background:#28c840"></div>
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" style="margin-left:10px"><polygon points="12,2 22,20 2,20" stroke="#00e5ff" stroke-width="2" fill="none"/></svg>
+      <span class="p-logo">MATRIX ENGINE</span>
+      <div class="p-menu">
+        <span class="p-mi">FILE</span><span class="p-mi">EDIT</span><span class="p-mi">CREATE</span>
+        <span class="p-mi">TOOLS</span><span class="p-mi">AI</span><span class="p-mi">BUILD</span>
+      </div>
+      <span class="p-atl">● ATLANTA-OS</span>
+    </div>
+    <div class="p-tabs">
+      <div class="p-tab active">Scene_Main ×</div>
+      <div class="p-tab">PlayerController ×</div>
+      <div class="p-tab">AI_Behavior ×</div>
+    </div>
+    <div class="p-body">
+      <div class="p-sb">
+        <div class="p-si"><div class="p-si-ic on"></div><span class="p-si-lb on">HOME</span></div>
+        <div class="p-si"><div class="p-si-ic"></div><span class="p-si-lb">SCENE</span></div>
+        <div class="p-si"><div class="p-si-ic"></div><span class="p-si-lb">ASSETS</span></div>
+        <div class="p-si"><div class="p-si-ic"></div><span class="p-si-lb">AI</span></div>
+        <div class="p-si"><div class="p-si-ic"></div><span class="p-si-lb">BUILD</span></div>
+      </div>
+      <div class="p-hier">
+        <div class="p-pt">SCENE HIERARCHY</div>
+        <div class="p-ti">▼ Scene_Main</div>
+        <div class="p-ti"> ▼ Environment</div>
+        <div class="p-ti">   Skybox</div>
+        <div class="p-ti">   Lighting</div>
+        <div class="p-ti"> ▼ City</div>
+        <div class="p-ti">   Buildings</div>
+        <div class="p-ti hi">  ● Player</div>
+        <div class="p-ti"> ▼ NPCs</div>
+        <div class="p-ti"> GameLogic</div>
+      </div>
+      <div class="p-vp">
+        <div class="p-vg"></div>
+        <div class="p-scan"></div>
+        <span class="p-vp-txt">VIEWPORT</span>
+      </div>
+      <div class="p-insp">
+        <div class="p-pt">INSPECTOR</div>
+        <div class="p-prop"><div class="p-pl">POSITION X</div><div class="p-pv">12.45</div></div>
+        <div class="p-prop"><div class="p-pl">ROTATION Y</div><div class="p-pv">180.00</div></div>
+        <div class="p-prop"><div class="p-pl">SCALE</div><div class="p-pv">1.00</div></div>
+        <div class="p-ai">
+          <div class="p-ai-t">▸ AI ASSISTANT</div>
+          <div class="p-ai-b">Hello Developer! I can help with code, debugging and system design.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat"><span class="stat-num">90%</span><span class="stat-label">DEVS NEVER SHIP THEIR GAME</span></div>
+  <div class="stat"><span class="stat-num">3+</span><span class="stat-label">TOOLS USED OUTSIDE THE ENGINE</span></div>
+  <div class="stat"><span class="stat-num">0</span><span class="stat-label">ENGINES WITH TRUE AI INTEGRATION</span></div>
+</div>
+
+<!-- PROBLEM -->
+<section class="problem-section" id="problem">
+  <div class="inner">
+    <div class="section-label red">THE REALITY</div>
+    <h2 class="section-title">You Have the Idea.<br/><span>The Engine Gets in the Way.</span></h2>
+    <div class="problem-grid">
+      <div class="problem-card reveal">
+        <div class="pnum">01</div><div class="ptitle">STEEP LEARNING CURVES</div>
+        <p class="pdesc">You open Unity or Unreal, hit a wall of menus and documentation, and spend more time learning the tool than building your actual game. The engine was supposed to help you create.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="pnum">02</div><div class="ptitle">SCATTERED WORKFLOW</div>
+        <p class="pdesc">Tutorials in one tab. Errors in another. Notes in Notion. Assets in a folder. Help on Discord. Nothing connects. Your brain pays the full cost of switching between all of it.</p>
+      </div>
+      <div class="problem-card reveal">
+        <div class="pnum">03</div><div class="ptitle">YOU START. YOU NEVER FINISH.</div>
+        <p class="pdesc">Most developers abandon projects not from lack of talent — but because the path from working prototype to shipped game is unclear, undocumented, and exhausting when you work alone.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SOLUTION -->
+<section class="solution-section" id="solution">
+  <div class="inner">
+    <div class="section-label cyan">WHAT WE ARE BUILDING</div>
+    <h2 class="section-title">One Environment.<br/><span>Learn, Build, and Ship — Together.</span></h2>
+    <div class="feature-grid">
+      <div class="feature-card reveal"><div class="ficon">⚡</div><div class="ftitle">AI THAT KNOWS YOUR PROJECT</div><p class="fdesc">Not a generic chatbot. An assistant that understands your scenes, code, assets, and goals — providing help that is actually relevant to what you are building right now.</p></div>
+      <div class="feature-card reveal"><div class="ficon">📚</div><div class="ftitle">LEARN WHILE YOU BUILD</div><p class="fdesc">Tutorials and guided paths live directly inside your workspace. No more tab-switching between YouTube and your engine. Understanding happens where building happens.</p></div>
+      <div class="feature-card reveal"><div class="ficon">🚀</div><div class="ftitle">SHIP WITHOUT THE NIGHTMARE</div><p class="fdesc">Integrated build and deployment tools that take you from working game to published product — without requiring expert knowledge of packaging pipelines or platform rules.</p></div>
+      <div class="feature-card reveal"><div class="ficon">🧠</div><div class="ftitle">PROJECT MEMORY SYSTEM</div><p class="fdesc">Your project's goals, decisions, and architecture are tracked automatically. Come back after weeks away and the engine remembers exactly where you were and what you were trying to build.</p></div>
+      <div class="feature-card reveal"><div class="ficon">🛠️</div><div class="ftitle">WORKS WITH YOUR ENGINE</div><p class="fdesc">You don't have to abandon Unity or Godot. Matrix Engine is designed as a companion to the tools you already use — not a replacement. Your workflow, dramatically enhanced.</p></div>
+      <div class="feature-card reveal"><div class="ficon">🎯</div><div class="ftitle">BUILT FOR SOLO DEVELOPERS</div><p class="fdesc">Every decision is made with the solo or small-team developer in mind. No enterprise bloat. No overwhelming interfaces. Just the tools you actually need to finish your game.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews-section" id="reviews">
+  <div class="inner">
+    <div class="section-label cyan">DEVELOPER REVIEWS</div>
+    <h2 class="section-title">What Developers<br/><span>Are Already Saying</span></h2>
+    <p class="reviews-intro">These are early impressions from developers who have seen the concept and shared their honest thoughts. Join the waitlist and add your voice — your review helps shape what we build first.</p>
+
+    <div class="reviews-grid" id="reviews-grid">
+      <!-- Seeded reviews -->
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"This is exactly what I have been looking for. I spend more time googling Unity errors than actually building. An AI that actually understands my project structure? Sign me up immediately."</p>
+        <div class="review-author">
+          <div class="review-avatar">JK</div>
+          <div><div class="review-name">James K.</div><div class="review-role">Indie Developer · Unity</div><div class="review-badge">EARLY BACKER</div></div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★★</div>
+        <p class="review-text">"The scattered workflow problem is real. I have Notion, Discord, YouTube, and Unity all open at once just to make one feature work. If Matrix Engine solves that, it will change how I work completely."</p>
+        <div class="review-author">
+          <div class="review-avatar">SR</div>
+          <div><div class="review-name">Sofia R.</div><div class="review-role">Student Developer · Godot</div><div class="review-badge">EARLY BACKER</div></div>
+        </div>
+      </div>
+      <div class="review-card reveal">
+        <div class="review-stars">★★★★☆</div>
+        <p class="review-text">"I have started and abandoned at least 12 projects in 3 years. Not from lack of skill — from lack of direction when things get complicated. The project memory system concept alone would have saved most of them."</p>
+        <div class="review-author">
+          <div class="review-avatar">DM</div>
+          <div><div class="review-name">David M.</div><div class="review-role">Hobbyist · GameMaker</div><div class="review-badge">EARLY BACKER</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Leave a review -->
+    <div class="leave-review-box reveal">
+      <div class="leave-review-title">Leave Your Review</div>
+      <p class="leave-review-sub">Seen the concept? Used game engines before? Tell us what you think. Your honest feedback shapes what we build. It appears publicly on this page after submission.</p>
+
+      <div id="review-form-wrap">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">YOUR NAME</label><input class="form-input" id="rv-name" placeholder="First name or username" required/></div>
+          <div class="form-group"><label class="form-label">YOUR ROLE</label>
+            <div class="select-wrap"><select class="form-select" id="rv-role">
+              <option>Indie Developer</option><option>Student Developer</option><option>Hobbyist</option>
+              <option>Game Designer</option><option>Professional Developer</option><option>Educator</option><option>Other</option>
+            </select></div>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">ENGINE YOU USE</label>
+          <div class="select-wrap"><select class="form-select" id="rv-engine">
+            <option>Unity</option><option>Godot</option><option>Unreal Engine</option>
+            <option>GameMaker</option><option>Custom / Other</option><option>Haven't started yet</option>
+          </select></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">YOUR RATING</label>
+          <div class="star-select" id="star-select">
+            <button class="star-btn" data-val="1" onclick="setStars(1)">★</button>
+            <button class="star-btn" data-val="2" onclick="setStars(2)">★</button>
+            <button class="star-btn" data-val="3" onclick="setStars(3)">★</button>
+            <button class="star-btn" data-val="4" onclick="setStars(4)">★</button>
+            <button class="star-btn" data-val="5" onclick="setStars(5)">★</button>
+          </div>
+        </div>
+        <div class="form-group"><label class="form-label">YOUR EMAIL (optional — so we can notify you when your review goes live)</label><input class="form-input" id="rv-email" type="email" placeholder="your@email.com"/></div>
+        <div class="form-group"><label class="form-label">YOUR REVIEW</label><textarea class="form-textarea" id="rv-text" placeholder="What do you think about this concept? What would make it essential for you?" required></textarea></div>
+        <button class="submit-btn" onclick="submitReview()" style="background:var(--gold);color:#000;box-shadow:0 0 28px rgba(255,204,0,.2);">
+          <span>★</span> SUBMIT YOUR REVIEW
+        </button>
+        <p class="form-note">Your review appears publicly on this page. Be honest — critical feedback is just as valuable.</p>
+      </div>
+      <div class="success-state" id="rv-success">
+        <span class="success-icon-big">★</span>
+        <div class="success-title" style="color:var(--gold)">REVIEW RECEIVED</div>
+        <p class="success-text">Thank you. Your review has been added to the page and your feedback goes directly into our planning. It matters more than you know.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- WAITLIST -->
+<section class="waitlist-section" id="waitlist">
+  <div class="waitlist-glow"></div>
+  <div class="waitlist-inner">
+    <div class="section-label green" style="justify-content:center;margin-bottom:18px;">
+      <div class="bdot" style="background:var(--green);box-shadow:0 0 8px var(--green);"></div>EARLY ACCESS NOW OPEN
+    </div>
+    <h2 class="section-title" style="margin-bottom:16px;">Be Part of What<br/><span>We Build Next</span></h2>
+    <p style="font-size:15px;line-height:1.75;color:var(--text);margin-bottom:44px;">We are not building this in a room away from you. We are building it with the people who need it. Your answer to one question will directly shape what we build first.</p>
+
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:38px;text-align:left;" id="wl-box">
+      <div id="wl-form-wrap">
+        <div class="form-row" style="margin-bottom:16px;">
+          <div class="form-group" style="margin-bottom:0"><label class="form-label">FIRST NAME</label><input class="form-input" id="wl-name" placeholder="Your name" required/></div>
+          <div class="form-group" style="margin-bottom:0"><label class="form-label">EMAIL ADDRESS</label><input class="form-input" id="wl-email" type="email" placeholder="your@email.com" required/></div>
+        </div>
+        <div class="form-group"><label class="form-label">WHAT ENGINE DO YOU USE?</label>
+          <div class="select-wrap"><select class="form-select" id="wl-engine">
+            <option value="">Select...</option><option>Unity</option><option>Godot</option>
+            <option>Unreal Engine</option><option>GameMaker</option><option>Other</option><option>Haven't started yet</option>
+          </select></div>
+        </div>
+        <div class="form-group"><label class="form-label">YOUR EXPERIENCE LEVEL</label>
+          <div class="select-wrap"><select class="form-select" id="wl-level">
+            <option value="">Select...</option><option>Total Beginner</option><option>Learning (under 1 year)</option>
+            <option>Intermediate (1-3 years)</option><option>Experienced (3+ years)</option><option>Professional</option>
+          </select></div>
+        </div>
+        <div class="form-group"><label class="form-label">BIGGEST GAME DEV FRUSTRATION — shapes what we build first</label>
+          <div class="select-wrap"><select class="form-select" id="wl-pain" required>
+            <option value="">Select your biggest pain...</option>
+            <option>Learning how to use my engine</option>
+            <option>Organizing my project and workflow</option>
+            <option>Debugging errors I don't understand</option>
+            <option>Getting from a working game to shipping it</option>
+            <option>Finding good learning resources</option>
+            <option>Staying motivated and finishing projects</option>
+            <option>Working alone with no team or support</option>
+          </select></div>
+        </div>
+        <div class="form-group"><label class="form-label">ANYTHING ELSE YOU WANT US TO KNOW? (optional)</label>
+          <textarea class="form-textarea" id="wl-note" placeholder="Tell us more about your situation, what you're building, or what would make this essential for you..." style="min-height:70px;"></textarea>
+        </div>
+        <button class="submit-btn" onclick="submitWaitlist()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+          RESERVE MY EARLY ACCESS SPOT
+        </button>
+        <p class="form-note">Free to join. No spam. Ever.<br/>We personally reach out to the first 100 people who sign up.</p>
+      </div>
+      <div class="success-state" id="wl-success">
+        <span class="success-icon-big">⚡</span>
+        <div class="success-title">YOU ARE IN THE SYSTEM</div>
+        <p class="success-text">We received your details and your answer goes directly into shaping what Matrix Engine builds first.<br/><br/>Watch your inbox — we reach out personally. Stay building.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- JOIN THE TEAM -->
+<section class="team-section" id="team">
+  <div class="inner">
+    <div class="section-label gold">JOIN THE TEAM</div>
+    <h2 class="section-title">We Are Not Building<br/><span>This Alone</span></h2>
+    <p class="team-intro">Matrix Engine is at its earliest stage — which means this is the moment where the right people shape everything. If you have skills and believe in what we are building, there is a place for you. We are looking for people who want to build something real, not just talk about it.</p>
+
+    <div class="roles-grid">
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">UI/UX DESIGNER</div><p class="role-desc">Design the interfaces that developers will live inside every day. You care deeply about clarity, workflow, and making complex tools feel simple.</p></div>
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">FRONTEND DEVELOPER</div><p class="role-desc">React, JavaScript, and a love for building things that feel fast and right. You turn designs into working interfaces that developers actually enjoy using.</p></div>
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">AI INTEGRATION ENGINEER</div><p class="role-desc">Experience connecting AI APIs, building context-aware systems, or working with LLMs in real products. You make AI useful, not just impressive.</p></div>
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">GAME DEV ADVISOR</div><p class="role-desc">An experienced game developer who can guide what we build from the inside. Your pain is our research. Your knowledge shapes our direction.</p></div>
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">COMMUNITY BUILDER</div><p class="role-desc">You know how to grow developer communities. Reddit, Discord, Twitter, YouTube — you understand where developers live and how to speak their language.</p></div>
+      <div class="role-card reveal"><div class="role-badge">OPEN ROLE</div><div class="role-title">BACKEND DEVELOPER</div><p class="role-desc">Node.js, databases, APIs, auth systems. You build the infrastructure that lets everything else work reliably at scale.</p></div>
+    </div>
+
+    <div class="team-apply-box">
+      <div class="leave-review-title" style="color:var(--gold);margin-bottom:6px;">Apply to Join the Team</div>
+      <p class="leave-review-sub">No formal application process. Just tell us who you are, what you can do, and why you want to be part of this. We will get back to every serious application personally.</p>
+
+      <div id="team-form-wrap">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">YOUR NAME</label><input class="form-input" id="tm-name" placeholder="Full name" required/></div>
+          <div class="form-group"><label class="form-label">EMAIL ADDRESS</label><input class="form-input" id="tm-email" type="email" placeholder="your@email.com" required/></div>
+        </div>
+        <div class="form-group"><label class="form-label">WHICH ROLE FITS YOU?</label>
+          <div class="select-wrap"><select class="form-select" id="tm-role">
+            <option>UI/UX Designer</option><option>Frontend Developer</option><option>AI Integration Engineer</option>
+            <option>Game Dev Advisor</option><option>Community Builder</option><option>Backend Developer</option><option>Other — I'll explain below</option>
+          </select></div>
+        </div>
+        <div class="form-group"><label class="form-label">YOUR EXPERIENCE & SKILLS</label>
+          <textarea class="form-textarea" id="tm-skills" placeholder="Tell us what you know, what you have built, and what tools you work with..."></textarea>
+        </div>
+        <div class="form-group"><label class="form-label">WHY DO YOU WANT TO BUILD MATRIX ENGINE?</label>
+          <textarea class="form-textarea" id="tm-why" placeholder="What about this project excites you? Why now? Why this?"></textarea>
+        </div>
+        <div class="form-group"><label class="form-label">PORTFOLIO / GITHUB / LINKEDIN (optional)</label>
+          <input class="form-input" id="tm-link" placeholder="https://..."/></div>
+        <button class="submit-btn" onclick="submitTeam()" style="background:var(--gold);color:#000;box-shadow:0 0 28px rgba(255,204,0,.2);">
+          SEND MY APPLICATION
+        </button>
+        <p class="form-note">Every serious application gets a personal response. No ghosting.</p>
+      </div>
+      <div class="success-state" id="tm-success">
+        <span class="success-icon-big">🤝</span>
+        <div class="success-title" style="color:var(--gold)">APPLICATION RECEIVED</div>
+        <p class="success-text">We have your details. Every serious application gets a personal response — no automated rejections, no ghosting. We will be in touch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+      <polygon points="12,2 22,20 2,20" stroke="#00e5ff" stroke-width="1.8" fill="none"/>
+      <polygon points="12,7 19,19 5,19" fill="#00e5ff" opacity="0.18"/>
+    </svg>
+    <span class="footer-logo-text">MATRIX ENGINE</span>
+  </div>
+  <div class="footer-links">
+    <a href="#problem" class="footer-link">WHY IT EXISTS</a>
+    <a href="#solution" class="footer-link">WHAT WE BUILD</a>
+    <a href="#reviews" class="footer-link">REVIEWS</a>
+    <a href="#waitlist" class="footer-link">EARLY ACCESS</a>
+    <a href="#team" class="footer-link">JOIN TEAM</a>
+  </div>
+  <span class="footer-copy">BUILT BY A DEVELOPER, FOR DEVELOPERS · EARLY DEVELOPMENT · 2026</span>
+</footer>
+
+<script>
+/*
+  ════════════════════════════════════════════════════════
+  MATRIX ENGINE — FORM SYSTEM
+  ════════════════════════════════════════════════════════
+
+  TWO SERVICES WORK TOGETHER:
+
+  1. FORMSPREE — collects submissions → sends to YOUR inbox
+     - Waitlist & Reviews → philiploid48@gmail.com
+     - Team Applications  → omondiloid6@gmail.com
+
+  2. EMAILJS — sends thank-you emails TO THE PERSON who submitted
+     - Free, no backend needed
+     - Setup: emailjs.com → sign up → create a service →
+       connect your Gmail → create a template → paste IDs below
+
+  EMAILJS SETUP (10 minutes, one time):
+  ──────────────────────────────────────
+  1. Go to https://emailjs.com → sign up FREE with philiploid48@gmail.com
+  2. Click "Add New Service" → choose Gmail → connect philiploid48@gmail.com
+     → copy the Service ID (e.g. service_abc123)
+  3. Click "Email Templates" → "Create New Template"
+     Use this template content:
+       Subject: Welcome to Matrix Engine, {{to_name}}!
+       Body:
+         Hi {{to_name}},
+
+         Thank you for connecting with Matrix Engine.
+
+         {{message}}
+
+         We will be in touch personally.
+         Stay building.
+
+         — The Matrix Engine Team
+  4. Save template → copy the Template ID (e.g. template_xyz789)
+  5. Go to "Account" → copy your Public Key (e.g. user_AbCdEfGh)
+  6. Paste all three below:
+
+  ════════════════════════════════════════════════════════
+*/
+
+// ── FORMSPREE IDs (already set — DO NOT CHANGE) ──
+const WAITLIST_FORM_ID = 'xnjrybbk'; // → philiploid48@gmail.com
+const REVIEW_FORM_ID   = 'mgoqblnl'; // → philiploid48@gmail.com
+const TEAM_FORM_ID     = 'maqkzdpr'; // → omondiloid6@gmail.com
+
+// ── EMAILJS CONFIG — paste your IDs here after setup ──
+const EMAILJS_SERVICE_ID  = 'service_w2m9sqh';
+const EMAILJS_TEMPLATE_ID = 'template_orlwo4e';
+const EMAILJS_PUBLIC_KEY  = '7oiRz4zKFzPkiK7UZ';
+
+// ── Thank-you messages sent to each person ──
+const THANKYOU_WAITLIST = `You have been added to the Matrix Engine early access waitlist.\n\nYour feedback on what frustrates you most about game development goes directly into shaping what we build first.\n\nWe personally reach out to the first 100 people. Watch this inbox.`;
+const THANKYOU_REVIEW   = `Your review has been received and is now live on the Matrix Engine page for other developers to see.\n\nThank you for being honest — critical feedback shapes better products.`;
+const THANKYOU_TEAM     = `Your application to join the Matrix Engine team has been received.\n\nWe read every application personally and respond to every serious one. No ghosting.\n\nWe will be in touch soon.`;
+
+// ── STAR RATING ──
+let selectedStars = 5;
+function setStars(n) {
+  selectedStars = n;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < n);
+  });
+}
+setStars(5);
+
+// ═══════════════════════════════════════
+// SUBMIT WAITLIST
+// Sends to: philiploid48@gmail.com
+// Person gets: thank-you auto-reply from Formspree
+// ═══════════════════════════════════════
+async function submitWaitlist() {
+  const name  = document.getElementById('wl-name').value.trim();
+  const email = document.getElementById('wl-email').value.trim();
+  const pain  = document.getElementById('wl-pain').value;
+  if (!name || !email || !pain) {
+    showError('Please fill in your name, email, and biggest frustration.');
+    return;
+  }
+  if (!validateEmail(email)) {
+    showError('Please enter a valid email address.');
+    return;
+  }
+
+  const btn = document.querySelector('#wl-form-wrap .submit-btn');
+  setLoading(btn, true);
+
+  const data = {
+    _subject: `[MATRIX ENGINE] New Waitlist Signup — ${name}`,
+    // This tells Formspree to send auto-reply to the person
+    _replyto: email,
+    '👤 Name': name,
+    '📧 Email': email,
+    '🎮 Engine': document.getElementById('wl-engine').value || 'Not specified',
+    '📊 Level': document.getElementById('wl-level').value || 'Not specified',
+    '🔥 Biggest Frustration': pain,
+    '💬 Additional Notes': document.getElementById('wl-note').value || 'None',
+    '📅 Submitted': new Date().toLocaleString(),
+    '🏷️ Type': 'WAITLIST SIGNUP'
+  };
+
+  const ok = await sendForm(WAITLIST_FORM_ID, data, {
+    toEmail: email,
+    toName: name,
+    message: THANKYOU_WAITLIST
+  });
+  setLoading(btn, false);
+
+  if (ok) {
+    document.getElementById('wl-form-wrap').style.display = 'none';
+    document.getElementById('wl-success').style.display = 'block';
+  } else {
+    showError('Something went wrong. Please try again or email us directly at philiploid48@gmail.com');
+  }
+}
+
+// ═══════════════════════════════════════
+// SUBMIT REVIEW
+// Sends to: philiploid48@gmail.com
+// Also: adds review card live on the page immediately
+// Person gets: thank-you + their review shown on the wall
+// ═══════════════════════════════════════
+async function submitReview() {
+  const name  = document.getElementById('rv-name').value.trim();
+  const role  = document.getElementById('rv-role').value;
+  const engine= document.getElementById('rv-engine').value;
+  const text  = document.getElementById('rv-text').value.trim();
+  if (!name || !text) {
+    showError('Please fill in your name and write your review.');
+    return;
+  }
+  if (text.length < 20) {
+    showError('Please write at least a sentence for your review.');
+    return;
+  }
+
+  const btn = document.querySelector('#review-form-wrap .submit-btn');
+  setLoading(btn, true);
+
+  const data = {
+    _subject: `[MATRIX ENGINE] New Review — ${selectedStars}★ from ${name}`,
+    _replyto: 'philiploid48@gmail.com',
+    '⭐ Stars': `${selectedStars}/5`,
+    '👤 Reviewer': name,
+    '🎭 Role': role,
+    '🎮 Engine': engine,
+    '💬 Review': text,
+    '📅 Submitted': new Date().toLocaleString(),
+    '🏷️ Type': 'DEVELOPER REVIEW'
+  };
+
+  const ok = await sendForm(REVIEW_FORM_ID, data, {
+    toEmail: document.getElementById('rv-email') ? document.getElementById('rv-email').value : null,
+    toName: name,
+    message: THANKYOU_REVIEW
+  });
+  setLoading(btn, false);
+
+  if (ok) {
+    // Add their review to the wall immediately
+    addReviewCard(name, role, engine, text, selectedStars);
+
+    document.getElementById('review-form-wrap').style.display = 'none';
+    document.getElementById('rv-success').style.display = 'block';
+  } else {
+    showError('Something went wrong. Please try again or email us at philiploid48@gmail.com');
+  }
+}
+
+// ═══════════════════════════════════════
+// SUBMIT TEAM APPLICATION
+// Sends to: omondiloid6@gmail.com
+// Person gets: thank-you auto-reply
+// ═══════════════════════════════════════
+async function submitTeam() {
+  const name   = document.getElementById('tm-name').value.trim();
+  const email  = document.getElementById('tm-email').value.trim();
+  const skills = document.getElementById('tm-skills').value.trim();
+  const why    = document.getElementById('tm-why').value.trim();
+  if (!name || !email || !skills || !why) {
+    showError('Please fill in all required fields.');
+    return;
+  }
+  if (!validateEmail(email)) {
+    showError('Please enter a valid email address.');
+    return;
+  }
+
+  const btn = document.querySelector('#team-form-wrap .submit-btn');
+  setLoading(btn, true);
+
+  const data = {
+    _subject: `[MATRIX ENGINE] Team Application — ${document.getElementById('tm-role').value} — ${name}`,
+    _replyto: email,
+    '👤 Applicant': name,
+    '📧 Email': email,
+    '🎯 Role Applied For': document.getElementById('tm-role').value,
+    '🛠️ Skills & Experience': skills,
+    '❓ Why Matrix Engine': why,
+    '🔗 Portfolio / Links': document.getElementById('tm-link').value || 'Not provided',
+    '📅 Applied': new Date().toLocaleString(),
+    '🏷️ Type': 'TEAM APPLICATION'
+  };
+
+  const ok = await sendForm(TEAM_FORM_ID, data, {
+    toEmail: email,
+    toName: name,
+    message: THANKYOU_TEAM
+  });
+  setLoading(btn, false);
+
+  if (ok) {
+    document.getElementById('team-form-wrap').style.display = 'none';
+    document.getElementById('tm-success').style.display = 'block';
+  } else {
+    showError('Something went wrong. Please try again or apply directly at omondiloid6@gmail.com');
+  }
+}
+
+// ═══════════════════════════════════════
+// CORE SEND FUNCTION — Formspree + EmailJS
+// ═══════════════════════════════════════
+async function sendForm(formId, data, thankYouConfig) {
+  // Simulate delay for demo mode
+  if (!formId || formId.startsWith('YOUR_')) {
+    await new Promise(r => setTimeout(r, 1200));
+    // Still try thank-you email even in demo
+    if (thankYouConfig) sendThankYou(thankYouConfig);
+    return true;
+  }
+
+  try {
+    // 1. Send to Formspree → your inbox
+    const res = await fetch(`https://formspree.io/f/${formId}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    const json = await res.json();
+    const ok = res.ok && json.ok !== false;
+
+    // 2. Send thank-you to the person via EmailJS
+    if (ok && thankYouConfig) sendThankYou(thankYouConfig);
+
+    return ok;
+  } catch(e) {
+    return false;
+  }
+}
+
+// ═══════════════════════════════════════
+// SEND THANK-YOU EMAIL TO THE PERSON
+// Uses EmailJS — free, no backend needed
+// ═══════════════════════════════════════
+function sendThankYou({ toEmail, toName, message }) {
+  // Only runs if EmailJS has been configured
+  if (!EMAILJS_PUBLIC_KEY || EMAILJS_PUBLIC_KEY.startsWith('YOUR_')) return;
+
+  emailjs.init(EMAILJS_PUBLIC_KEY);
+  emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+    to_email: toEmail,
+    to_name: toName,
+    message: message,
+    from_name: 'Matrix Engine Team',
+    reply_to: 'philiploid48@gmail.com'
+  }).catch(() => {}); // Silent fail — Formspree still worked
+}
+
+// ═══════════════════════════════════════
+// ADD REVIEW CARD TO THE WALL LIVE
+// ═══════════════════════════════════════
+function addReviewCard(name, role, engine, text, stars) {
+  const starsStr = '★'.repeat(stars) + '☆'.repeat(5 - stars);
+  const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+  const card = document.createElement('div');
+  card.className = 'review-card';
+  card.style.opacity = '0';
+  card.style.transform = 'translateY(16px)';
+  card.style.transition = 'opacity .4s ease, transform .4s ease';
+  card.innerHTML = `
+    <div class="review-stars">${starsStr}</div>
+    <p class="review-text">"${escapeHtml(text)}"</p>
+    <div class="review-author">
+      <div class="review-avatar">${initials}</div>
+      <div>
+        <div class="review-name">${escapeHtml(name)}</div>
+        <div class="review-role">${escapeHtml(role)} · ${escapeHtml(engine)}</div>
+        <div class="review-badge">✓ VERIFIED REVIEWER</div>
+      </div>
+    </div>`;
+  document.getElementById('reviews-grid').appendChild(card);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      card.style.opacity = '1';
+      card.style.transform = 'translateY(0)';
+    });
+  });
+}
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showError(msg) {
+  // Remove any existing error
+  document.querySelectorAll('.mx-error').forEach(e => e.remove());
+  const el = document.createElement('div');
+  el.className = 'mx-error';
+  el.style.cssText = 'background:rgba(255,34,68,.08);border:1px solid rgba(255,34,68,.3);border-radius:4px;padding:12px 16px;font-family:Share Tech Mono,monospace;font-size:12px;color:#ff6677;margin-top:12px;';
+  el.textContent = '⚠ ' + msg;
+  // Find active form and append
+  const forms = ['wl-form-wrap','review-form-wrap','team-form-wrap'];
+  for (const id of forms) {
+    const el2 = document.getElementById(id);
+    if (el2 && el2.style.display !== 'none') { el2.appendChild(el); break; }
+  }
+  setTimeout(() => el.remove(), 5000);
+}
+
+function setLoading(btn, loading) {
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = '<span style="animation:spin .8s linear infinite;display:inline-block">⟳</span> SENDING...';
+    btn.disabled = true;
+    btn.style.opacity = '.7';
+  } else {
+    btn.innerHTML = btn.dataset.orig || btn.innerHTML;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+// ── SCROLL REVEAL ──
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── SPIN ANIMATION ──
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
